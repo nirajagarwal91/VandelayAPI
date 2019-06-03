@@ -33,6 +33,7 @@ namespace VandelayWebAPI
             var connectionString = Configuration["connectionStrings:vandelayDBConnectionString"];
             //services.AddDbContext<FactoryContext>(o => o.UseSqlServer(connectionString));
             services.AddDbContext<FactoryContext>(options => options.UseInMemoryDatabase("vandelayDB"));
+            services.AddDbContext<WarehouseContext>(options => options.UseInMemoryDatabase("vandelayDB"));
             //registering the repository
             services.AddScoped<IFactoryRepository, FactoryRepository>();
             services.AddSwaggerGen(c =>
@@ -42,7 +43,7 @@ namespace VandelayWebAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, FactoryContext factoryContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, FactoryContext factoryContext, WarehouseContext warehouseContext)
         {
             //app.UseStaticFiles();
             
@@ -67,11 +68,6 @@ namespace VandelayWebAPI
                 });
             }
 
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vandelay API v1");
-            //});
-            //app.UseHttpsRedirection();
             AutoMapper.Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Entities.Factory, Models.FactoryDto>();
@@ -79,8 +75,11 @@ namespace VandelayWebAPI
                     //    opt => opt.MapFrom(src =>
                     //        $"{src.FactoryAddress.BuildingName}, {src.FactoryAddress.StreetLine1}, {src.FactoryAddress.StreetLine2}, {src.FactoryAddress.City}, {src.FactoryAddress.StateProvince}, {src.FactoryAddress.ZipPostalCode}, {src.FactoryAddress.Country}"));
                 cfg.CreateMap<Entities.Machine, Models.MachineDto>();
+                cfg.CreateMap<Entities.Warehouse, Models.WarehouseDto>();
+                cfg.CreateMap<Entities.Inventory, Models.InventoryDto>();
             });
             factoryContext.SeedDataForFactoryContext();
+            warehouseContext.SeedDataForWarehouseContext();
             app.UseMvc();
         }
     }

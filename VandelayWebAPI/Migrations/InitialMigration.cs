@@ -63,10 +63,46 @@ namespace VandelayWebAPI.Migrations
             //            onDelete: ReferentialAction.Cascade);
             //    });
 
+            migrationBuilder.CreateTable(
+                name: "Warehouses",
+                columns: table => new
+                {
+                    WarehouseId = table.Column<int>(nullable: false),
+                    WarehouseName = table.Column<string>(nullable: false),
+                    WarehouseDescription = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Warehouses", x => x.WarehouseId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Inventories",
+                columns: table => new
+                {
+                    ItemId = table.Column<int>(nullable: false),
+                    ItemSKU = table.Column<int>(nullable: false),
+                    ItemQuantity = table.Column<string>(nullable: false),
+                    ItemName = table.Column<string>(nullable: false),
+                    ItemDescription = table.Column<string>(nullable: true),
+                    ItemDelete = table.Column<bool>(nullable: false),
+                    WarehouseId = table.Column<Int64>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemId", x => x.ItemId);
+                    table.ForeignKey(
+                        name: "FK_Inventory_Warehouse_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "WarehouseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Machines_FactoryId",
-                table: "Machines",
-                column: "FactoryId");
+                name: "IX_Inventories_WarehouseId",
+                table: "Inventories",
+                column: "WarehouseId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -77,7 +113,13 @@ namespace VandelayWebAPI.Migrations
             //    name: "Address");
             migrationBuilder.DropTable(
                 name: "Factories");
-            
+            migrationBuilder.DropTable(
+                name: "Inventories");
+            //migrationBuilder.DropTable(
+            //    name: "Address");
+            migrationBuilder.DropTable(
+                name: "Warehouses");
+
         }
     }
 }

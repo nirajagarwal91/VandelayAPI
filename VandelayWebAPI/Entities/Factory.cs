@@ -12,7 +12,7 @@ namespace VandelayWebAPI.Entities
         [Required]
         [MaxLength(100)]
         public string FactoryDescription { get; set; }
-        [Required]
+        //[Required]
         //public Address FactoryAddress { get; set; }
 
         public ICollection<Machine> Machines { get; set; } = new List<Machine>();
