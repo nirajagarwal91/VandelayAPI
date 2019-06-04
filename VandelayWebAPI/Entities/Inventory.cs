@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VandelayWebAPI.Entities
@@ -16,6 +17,8 @@ namespace VandelayWebAPI.Entities
         public string ItemName { get; set; }
         [Required]
         public string ItemDescription { get; set; }
+
+        [DefaultValue(false)]
         public bool ItemDelete { get; set; }
 
         [ForeignKey("WarehouseId")]

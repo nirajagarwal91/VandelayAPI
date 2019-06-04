@@ -50,6 +50,29 @@ namespace VandelayWebAPI.Services
             return _warehouseContext.Inventories
                 .Where(b => b.ItemDelete == false).OrderBy(b => b.ItemId).ToList();
         }
+
+        public Inventory GetInventoryForWarehouse(int warehouseId, int itemId)
+        {
+            return _warehouseContext.Inventories.Where(b => b.WarehouseId == warehouseId && b.ItemId == itemId)
+                .FirstOrDefault();
+        }
+        public Warehouse GetWarehouse(int warehouseId)
+        {
+            return _warehouseContext.Warehouses.FirstOrDefault(a => a.WarehouseId == warehouseId);
+        }
+
+        public void AddInventoryForWarehouse(int warehouseId, Inventory inventory)
+        {
+            var warehouse = GetWarehouse(warehouseId);
+            if (warehouse != null)
+            {
+                var inventoriesForWarehouse = GetInventories(warehouseId);
+                var maxInventoryItemId = inventoriesForWarehouse.Select(a => a.ItemId).Max(); 
+                inventory.ItemId = maxInventoryItemId + 1;
+                inventory.WarehouseId = warehouseId;
+                warehouse.Inventories.Add(inventory);
+            }
+        }
         public bool Save()
         {
             return (_context.SaveChanges() >= 0);
