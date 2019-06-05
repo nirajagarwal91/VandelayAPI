@@ -14,7 +14,7 @@ namespace VandelayWebAPI.Services
         Warehouse GetWarehouse(int warehouseId);
         Inventory GetInventoryForWarehouse(int warehouseId, int itemId);
         void AddInventoryForWarehouse(int warehouseId, Inventory inventory);
-        //void UpdateItem(Inventory inventory);
+        void UpdateItem(Inventory inventory);
         bool Save();
         bool SaveWarehouse();
     }

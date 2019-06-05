@@ -20,7 +20,6 @@ namespace VandelayWebAPI.Migrations
                 modelBuilder.Entity("VandelayWebAPI.Entities.Factory", b =>
                 {
                     b.Property<int>("FactoryId");
-                        //.ValueGeneratedOnAdd();
 
                     b.Property<string>("FactoryName")
                         .IsRequired();
@@ -37,7 +36,6 @@ namespace VandelayWebAPI.Migrations
                 modelBuilder.Entity("VandelayWebAPI.Entities.Machine", b =>
                 {
                     b.Property<int>("MachineId");
-                        //.ValueGeneratedOnAdd();
 
                     b.Property<int>("FactoryId");
 

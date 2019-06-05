@@ -32,11 +32,11 @@ namespace VandelayWebAPI
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 
-            var connectionString = Configuration["connectionStrings:vandelayDBConnectionString"];
-            services.AddDbContext<FactoryContext>(o => o.UseSqlServer(connectionString));
-            services.AddDbContext<WarehouseContext>(o => o.UseSqlServer(connectionString));
-            //services.AddDbContext<FactoryContext>(options => options.UseInMemoryDatabase("vandelayDB"));
-            //services.AddDbContext<WarehouseContext>(options => options.UseInMemoryDatabase("vandelayDB"));
+            //var connectionString = Configuration["connectionStrings:vandelayDBConnectionString"];
+            //services.AddDbContext<FactoryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VandelayDBConnectionString")));
+            //services.AddDbContext<WarehouseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VandelayDBConnectionString")));
+            services.AddDbContext<FactoryContext>(options => options.UseInMemoryDatabase("vandelayDB"));
+            services.AddDbContext<WarehouseContext>(options => options.UseInMemoryDatabase("vandelayDB"));
 
             //registering the repository
             services.AddScoped<IFactoryRepository, FactoryRepository>();
@@ -80,6 +80,8 @@ namespace VandelayWebAPI
                 cfg.CreateMap<Entities.Warehouse, Models.WarehouseDto>();
                 cfg.CreateMap<Entities.Inventory, Models.InventoryDto>();
                 cfg.CreateMap<Models.InventoryItem, Entities.Inventory>();
+                cfg.CreateMap<Models.InventoryUpdate, Entities.Inventory>();
+                cfg.CreateMap<Entities.Inventory, Models.InventoryUpdate>();
             });
             factoryContext.SeedDataForFactoryContext();
             warehouseContext.SeedDataForWarehouseContext();

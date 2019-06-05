@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using VandelayWebAPI.Entities;
 using VandelayWebAPI.Models;
@@ -62,7 +64,7 @@ namespace VandelayWebAPI.Controllers
             var inventoryEntity = Mapper.Map<Inventory>(inventory);
 
             _factoryRepository.AddInventoryForWarehouse(warehouseId, inventoryEntity);
-            if (!_factoryRepository.Save())
+            if (!_factoryRepository.SaveWarehouse())
             {
                 return StatusCode(500, $"Creating an inventory for {warehouseId} failed!");
             }
@@ -71,21 +73,61 @@ namespace VandelayWebAPI.Controllers
             return CreatedAtRoute("GetInventoryForWarehouse", new { warehouseId = warehouseId, itemId = inventoryToReturn.ItemId }, inventoryToReturn);
         }
 
-        //[HttpPatch("{warehouseId}")]
-        //public IActionResult UpdateItem(int warehouseId, [FromBody] InventoryUpdate inventory)
-        //{
-        //    if (!_factoryRepository.WarehouseExists(warehouseId))
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPatch("{itemId}")]
+        public IActionResult UpdateItem(int warehouseId, int itemId, [FromBody] JsonPatchDocument<InventoryUpdate> inventoryPatchDocument)
+        {
+            if (inventoryPatchDocument == null)
+            {
+                return BadRequest();
+            }
+            if (!_factoryRepository.WarehouseExists(warehouseId))
+            {
+                return NotFound();
+            }
 
-        //    _factoryRepository.updateInventory(inventory);
-        //    if (!_factoryRepository.Save())
-        //    {
-        //        return StatusCode(500, "Updating an inventory failed!");
-        //    }
-        //    var inventoryInWarehouse = _factoryRepository.GetMachines(warehouseId);
-        //    return CreatedAtRoute("GetWarehouse", new { warehouseId = inventoryInWarehouse.warehouseId }, inventoryInWarehouse);
-        //}
+            var inventoryFromWareHouseRepo = _factoryRepository.GetInventoryForWarehouse(warehouseId, itemId);
+
+            if (inventoryFromWareHouseRepo == null)
+            {
+                var invDto = new InventoryUpdate();
+                inventoryPatchDocument.ApplyTo(invDto, ModelState);
+
+                TryValidateModel(invDto);
+
+                if (!ModelState.IsValid)
+                {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+                var inventoryToAdd = Mapper.Map<Inventory>(invDto);
+                inventoryToAdd.ItemId= itemId;
+
+                _factoryRepository.AddInventoryForWarehouse(warehouseId, inventoryToAdd);
+                if (!_factoryRepository.SaveWarehouse())
+                {
+                    throw new Exception($"Upserting inventory {itemId} for Warehouse {warehouseId} failed on save.");
+                }
+
+                var inventoryToReturn = Mapper.Map<InventoryDto>(inventoryToAdd);
+                return CreatedAtRoute("GetInventoryForWarehouse", new { warehouseId = warehouseId, itemId = inventoryToReturn.ItemId }, inventoryToReturn);
+            }
+
+            var inventoryToPatch = Mapper.Map<InventoryUpdate>(inventoryFromWareHouseRepo);
+            inventoryPatchDocument.ApplyTo(inventoryToPatch, ModelState);
+            TryValidateModel(inventoryToPatch);
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            Mapper.Map(inventoryToPatch, inventoryFromWareHouseRepo);
+            _factoryRepository.UpdateItem(inventoryFromWareHouseRepo);
+            if (!_factoryRepository.SaveWarehouse())
+            {
+                throw new Exception($"Patching inventory {itemId} for Warehouse {warehouseId} failed on save.");
+            }
+
+            return NoContent();
+        }
     }
 }

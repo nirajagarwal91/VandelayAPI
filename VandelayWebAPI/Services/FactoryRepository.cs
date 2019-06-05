@@ -73,6 +73,11 @@ namespace VandelayWebAPI.Services
                 warehouse.Inventories.Add(inventory);
             }
         }
+
+        public void UpdateItem(Inventory inventory)
+        {
+
+        }
         public bool Save()
         {
             return (_context.SaveChanges() >= 0);

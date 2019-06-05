@@ -25,17 +25,5 @@ namespace VandelayWebAPI.Controllers
             var warehouses = Mapper.Map<IEnumerable<WarehouseDto>>(warehousesFromRepo);
             return Ok(warehouses);
         }
-
-        //// GET api/warehouses/{id}
-        //[HttpGet("{warehouseId}")]
-        //public IActionResult GetWarehouses(int id)
-        //{
-        //    var warehouse = _factoryRepository.GetWarehouses(id);
-        //    if (warehouse == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(warehouse);
-        //}
     }
 }
